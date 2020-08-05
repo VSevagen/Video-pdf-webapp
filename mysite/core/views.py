@@ -3,6 +3,7 @@ from django.views.generic import TemplateView, ListView, CreateView
 from django.utils.encoding import smart_str
 from django.http import HttpResponse, Http404
 from django.core.files.storage import FileSystemStorage
+from django.views.static import serve
 from django.conf import settings
 from django.urls import reverse_lazy
 from skimage.metrics import structural_similarity
@@ -25,6 +26,8 @@ class Home(TemplateView):
 def upload(request):
     context = {}
     if request.method == 'POST':
+        if myfun() > 1:
+            os.chdir('..')
         uploaded_file = request.FILES['document']
         fs = FileSystemStorage()
         name = fs.save(uploaded_file.name, uploaded_file)
@@ -33,6 +36,7 @@ def upload(request):
         makepdf()
         download(request)
         context['url'] = fs.url(name)
+        myfun()
     return render(request, 'upload.html', context)
 
 def video_process(uploaded_file):
@@ -127,7 +131,6 @@ def makepdf():
     myimages = []
     dirFiles = os.listdir(os.getcwd())
     fnames = sorted([fname for fname in os.listdir(os.getcwd()) if fname.endswith('.jpg')], key=lambda f: int(f.rsplit(os.path.extsep, 1)[0].rsplit(None,1)[-1]))
-
     with open("output.pdf", "wb") as f:
         f.write(img2pdf.convert([i for i in fnames if i.endswith(".jpg")]))
 
@@ -138,20 +141,12 @@ def makepdf():
 
 
 def download(request):
-    fl_path = os.getcwd()+"/output.pdf"
-    filename = 'output.pdf'
+    fl_path = os.getcwd() + "/output.pdf"
+    return serve(request, os.path.basename(fl_path),os.path.dirname(fl_path))
 
-    file_path = os.path.join(settings.MEDIA_ROOT, fl_path)
-    if os.path.exists(file_path):
-        with open(file_path, 'rb') as fh:
-            response = HttpResponse(fh.read(), content_type="application/pdf")
-            response['Content-Disposition'] = 'inline; filename=' + os.path.basename(file_path)
-            return response
-    raise Http404
-
-
-
-
+def myfun(i=[0]):
+    i[0]+=1
+    return i[0]
 
 
 
