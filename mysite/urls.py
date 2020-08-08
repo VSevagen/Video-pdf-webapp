@@ -7,7 +7,7 @@ from mysite.core import views
 
 
 urlpatterns = [
-    path('', views.Home.as_view(), name='home'),
+    path('',views.upload, name='upload' ),
     path('upload/', views.upload, name='upload'),
     path('books/', views.book_list, name='book_list'),
     path('books/upload/', views.upload_book, name='upload_book'),
