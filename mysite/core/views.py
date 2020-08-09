@@ -4,6 +4,7 @@ from django.utils.encoding import smart_str
 from django.http import HttpResponse, Http404
 from django.core.files.storage import FileSystemStorage
 from django.views.static import serve
+from django.views import View
 from django.conf import settings
 from django.urls import reverse_lazy
 from skimage.metrics import structural_similarity
@@ -22,7 +23,6 @@ from .models import Book
 class Home(TemplateView):
     template_name = 'home.html'
 
-
 def upload(request):
     context = {}
     if request.method == 'POST':
@@ -36,7 +36,7 @@ def upload(request):
         makepdf()
         download(request)
         context['url'] = fs.url(name)
-        myfun()
+        # myfun()
     return render(request, 'upload.html', context)
 
 def video_process(uploaded_file):

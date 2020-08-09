@@ -8,7 +8,7 @@
     <button type="submit">Upload file</button>
   </form>
   {% if url %}
-    <p>Uploaded file: <a href="{{ url }}">{{ url }}</a></p>
-    <p>Download pdf:<a href="/pdf">Click here</a></p>
+    <span>Uploaded file: <a href="{{ url }}">{{ url }}</a></span><br>
+    <span>Download pdf:<a href="/pdf">Click here</a></span>
   {% endif %}
 {% endblock %}
