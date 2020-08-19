@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <p>Fetched images from the video</p>
+    <p>Eliminated the duplicates.</p>
+
+    <span>Download pdf:<a href="/pdf">Click here</a></span>
+</div>
+<div class="container">
+    <p>The above eliminating process was done through structural similarity. In order to obtain better pdf, click the button below.</p>
+
+    <a href="{% url 'get_pdf' %}" class="btn btn-primary" style="border-radius: 40px;">
+        Create new pdf
+      </a>
+</div>
+{% endblock %}
