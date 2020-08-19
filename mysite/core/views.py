@@ -29,19 +29,21 @@ def upload(request):
         if myfun() > 1:
             os.chdir('..')
         uploaded_file = request.FILES['document']
+        request.session['file'] = uploaded_file.name
         fs = FileSystemStorage()
         name = fs.save(uploaded_file.name, uploaded_file)
-        video_process(uploaded_file)
-        removeDup()
-        raw_remove()
-        makepdf()
-        download(request)
+        # video_process(uploaded_file, request)
+        # removeDup()
+        # raw_remove()
+        # makepdf()
+        # download(request)
         context['url'] = fs.url(name)
         # myfun()
     return render(request, 'upload.html', context)
 
-def video_process(uploaded_file):
-    path = join(os.getcwd(), "media/"+uploaded_file.name)
+def video_process(request):
+    uploaded_file = request.session['file']
+    path = join(os.getcwd(), "media/"+uploaded_file)
     Path = os.getcwd() + "/images"
     vidcap = cv2.VideoCapture(path)
     def getFrame(sec):
@@ -61,6 +63,10 @@ def video_process(uploaded_file):
         sec = sec + frameRate
         sec = round(sec, 2)
         success = getFrame(sec)
+
+    removeDup()
+    return render(request, 'images.html')
+
 
 
 def removeDup():
@@ -125,9 +131,21 @@ def removeDup():
     FindNRemoveGreyDupli(greyDir)
     RemoveDupli(greyDir, Path)
     shutil.rmtree(greyDir)
+    copytree(os.getcwd()+"/images", os.getcwd()+"/test")
+    makepdf()
 
-def raw_remove():
-    path = os.getcwd()+"/images"
+def copytree(src, dst, symlinks=False, ignore=None):
+    for item in os.listdir(src):
+        s = os.path.join(src, item)
+        d = os.path.join(dst, item)
+        if os.path.isdir(s):
+            shutil.copytree(s, d, symlinks, ignore)
+        else:
+            shutil.copy2(s, d)
+
+def raw_remove(request):
+    os.chdir('..')
+    path = os.getcwd() + "/test"
     os.chdir(path)
     myimages = []
     dirFiles = os.listdir(os.getcwd())
@@ -149,8 +167,10 @@ def raw_remove():
                 if h > 0.87:
                     os.remove(image)
                     print(image, imageCom, h)
+    makepdf2()
+    return render(request, 'eliminate.html')
 
-def makepdf():
+def makepdf2():
     path = os.getcwd()
     os.chdir(path)
     myimages = []
@@ -158,6 +178,20 @@ def makepdf():
     fnames = sorted([fname for fname in os.listdir(os.getcwd()) if fname.endswith('.jpg')], key=lambda f: int(f.rsplit(os.path.extsep, 1)[0].rsplit(None,1)[-1]))
     with open("output.pdf", "wb") as f:
         f.write(img2pdf.convert([i for i in fnames if i.endswith(".jpg")]))
+
+    imgDir = os.listdir(path)
+    for image in imgDir:
+        if image.endswith(".jpg"):
+            os.remove(os.path.join(path, image))
+
+def makepdf():
+    path = os.getcwd() + "/images"
+    os.chdir(path)
+    myimages = []
+    dirFiles = os.listdir(os.getcwd())
+    fnames = sorted([fname for fname in os.listdir(os.getcwd()) if fname.endswith('.jpg')], key=lambda f: int(f.rsplit(os.path.extsep, 1)[0].rsplit(None,1)[-1]))
+    with open("output.pdf", "wb") as f:
+        f.write(img2pdf.convert([j for j in fnames if j.endswith(".jpg")]))
 
     imgDir = os.listdir(path)
     for image in imgDir:
@@ -172,7 +206,6 @@ def download(request):
 def myfun(i=[0]):
     i[0]+=1
     return i[0]
-
 
 
 
