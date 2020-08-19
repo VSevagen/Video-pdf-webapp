@@ -9,6 +9,9 @@
   </form>
   {% if url %}
     <span>Uploaded file: <a href="{{ url }}">{{ url }}</a></span><br>
-    <span>Download pdf:<a href="/pdf">Click here</a></span>
+    <!-- <span>Download pdf:<a href="/pdf">Click here</a></span> -->
+    <a href="{% url 'video_process' %}" class="btn btn-primary" style="border-radius: 40px;">
+      Create Pdf
+    </a>
   {% endif %}
 {% endblock %}
